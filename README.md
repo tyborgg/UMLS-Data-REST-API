@@ -1,4 +1,4 @@
-#REST API for the UMLS DB
+# REST API for the UMLS DB
 
 Endpoints to retrieve content from the UMLS database
 
