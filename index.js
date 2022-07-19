@@ -33,12 +33,10 @@ app.get("/definition/CUI/:CUI", (req, res) => {
                 "FROM mrdef " +
                 "WHERE CUI = \'" + req.params.CUI + "\';";
 
-    console.log(query);
-
     db.query(query, (err, Definitions) => {
         if(err){
             console.log("Error retrieving Definition information");
-            res.json({CUI: "CUI Does Not Exist"});
+            res.json({Definition: "Definition Does Not Exist"});
         }
         else{
             console.log("Defintion Success");
@@ -51,13 +49,35 @@ app.get("/definition/CUI/:CUI", (req, res) => {
             db.query(query, (err, Terms) => {
                 if(err){
                     console.log("Error retrieving String information");
-                    res.json({CUI: "CUI Does Not Exist"});
+                    res.json({Term: "Term Does Not Exist"});
                 }
                 else{
                     console.log("String Success");
                     res.json({Definitions_Returned: Definitions.length, Definitions, Terms_Returned: Terms.length, Terms});
                 }
             });
+        }
+    });
+});
+
+//Relations Route
+app.get("/relations/CUI/:CUI", (req, res) => {
+    var query = "SELECT DISTINCT r.CUI1, r.AUI1, c1.STR, r.RELA, r.CUI2, r.AUI2, c2.STR, r.REL " +
+                "FROM mrrel r, mrconso c1, mrconso c2 " +
+                "WHERE r.CUI1 = \'" + req.params.CUI + "\' " +
+                "AND r.AUI1 = c1.AUI " +
+                "AND r.AUI2 = c2.AUI;";
+
+    console.log(query);
+
+    db.query(query, (err, Relations) => {
+        if(err){
+            console.log("Error retrieving Definition information");
+            res.json({Relation: "Relation Does Not Exist"});
+        }
+        else{
+            console.log("Relation Success");
+            res.json({Relations_Returned: Relations.length, Relations})
         }
     });
 });
