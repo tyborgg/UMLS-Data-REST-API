@@ -61,8 +61,8 @@ app.get("/definition/CUI/:CUI", (req, res) => {
 });
 
 //Relations Route
-app.get("/relations/CUI/:CUI", (req, res) => {
-    var query = "SELECT DISTINCT r.CUI1, r.AUI1, c1.STR, r.RELA, r.CUI2, r.AUI2, c2.STR, r.REL " +
+app.get("/relation/CUI/:CUI", (req, res) => {
+    var query = "SELECT DISTINCT r.CUI1, r.AUI1, c1.STR AS STR1, r.RELA, r.CUI2, r.AUI2, c2.STR AS STR2, r.REL " +
                 "FROM mrrel r, mrconso c1, mrconso c2 " +
                 "WHERE r.CUI1 = \'" + req.params.CUI + "\' " +
                 "AND r.AUI1 = c1.AUI " +
