@@ -1,8 +1,11 @@
 const express = require("express");
+const db = require("./mysqlConnection");
+const bodyParser = require("body-parser");
 const app = express();
-const db = require("./mysqlConnection")
-
 const port = process.env.port || 3000;
+
+app.use(bodyParser.urlencoded({ extended: true}));
+app.use(bodyParser.json());
 
 db.connect((err) => {
     if(err) console.log(err);
@@ -62,13 +65,11 @@ app.get("/definition/CUI/:CUI", (req, res) => {
 
 //Relations Route
 app.get("/relation/CUI/:CUI", (req, res) => {
-    var query = "SELECT DISTINCT r.CUI1, r.AUI1, c1.STR AS STR1, r.RELA, r.CUI2, r.AUI2, c2.STR AS STR2, r.REL " +
+    var query = "SELECT DISTINCT r.CUI2 AS CUI1, r.AUI2 AS AUI1, c2.STR AS STR1, r.RELA, r.CUI1 AS CUI2, r.AUI1 AS AUI2, c1.STR AS STR2, r.REL " +
                 "FROM mrrel r, mrconso c1, mrconso c2 " +
-                "WHERE r.CUI1 = \'" + req.params.CUI + "\' " +
+                "WHERE r.CUI2 = \'" + req.params.CUI + "\' " +
                 "AND r.AUI1 = c1.AUI " +
                 "AND r.AUI2 = c2.AUI;";
-
-    console.log(query);
 
     db.query(query, (err, Relations) => {
         if(err){
