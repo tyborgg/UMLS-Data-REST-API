@@ -13,19 +13,19 @@ db.connect((err) => {
 });
 
 //Concept Information Route
-app.get("/concept_information/CUI/:CUI", (req, res) => {
+app.get("/concept/CUI/:CUI", (req, res) => {
     var query = "SELECT * " +
                 "FROM mrconso " +
                 "WHERE CUI = \'" + req.params.CUI + "\';";
 
-    db.query(query, (err, Concept_Information) => {
+    db.query(query, (err, Concept) => {
         if(err){
             console.log("Error retrieving CUI information");
             res.json({CUI: "CUI Does Not Exist"});
         }
         else{
-            console.log("Success");
-            res.json({Elements_Returned: Concept_Information.length, Concept_Information});
+            console.log("Concept Success");
+            res.json({Elements_Returned: Concept.length, Concept});
         }
     });
 });
@@ -73,12 +73,33 @@ app.get("/relation/CUI/:CUI", (req, res) => {
 
     db.query(query, (err, Relations) => {
         if(err){
-            console.log("Error retrieving Definition information");
+            console.log("Error retrieving Relation information");
             res.json({Relation: "Relation Does Not Exist"});
         }
         else{
             console.log("Relation Success");
             res.json({Relations_Returned: Relations.length, Relations})
+        }
+    });
+});
+
+//May_Treat Route
+app.get("/may_treat/CUI/:CUI", (req, res) => {
+    var query = "SELECT DISTINCT r.CUI2 AS CUI1, r.AUI2 AS AUI1, c2.STR AS STR1, r.RELA, r.CUI1 AS CUI2, r.AUI1 AS AUI2, c1.STR AS STR2, r.REL " +
+                "FROM mrrel r, mrconso c1, mrconso c2 " +
+                "WHERE r.CUI2 = \'" + req.params.CUI + "\' " +
+                "AND r.AUI1 = c1.AUI " +
+                "AND r.AUI2 = c2.AUI " +
+                "AND r.RELA = \'may_treat\';";
+
+    db.query(query, (err, Relations_May_Treat) => {
+        if(err){
+            console.log("Error retrieving Relation information");
+            res.json({Relation: "Relation Does Not Exist"});
+        }
+        else{
+            console.log("Relations_May_Treat Success");
+            res.json({Relations_May_Treat_Returned: Relations_May_Treat.length, Relations_May_Treat})
         }
     });
 });
