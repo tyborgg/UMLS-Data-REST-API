@@ -1,11 +1,13 @@
 const express = require("express");
 const db = require("./mysqlConnection");
 const bodyParser = require("body-parser");
+const cors = require("cors");
 const app = express();
-const port = process.env.port || 3000;
+const port = process.env.port || 5000;
 
 app.use(bodyParser.urlencoded({ extended: true}));
 app.use(bodyParser.json());
+app.use(cors());
 
 db.connect((err) => {
     if(err) console.log(err);
@@ -30,7 +32,7 @@ app.get("/concept/CUI/:CUI", (req, res) => {
     });
 });
 
-//Definition Route
+//Definition Route (CUI Input)
 app.get("/definition/CUI/:CUI", (req, res) => {
     var query = "SELECT DISTINCT DEF " +
                 "FROM mrdef " +
@@ -59,6 +61,27 @@ app.get("/definition/CUI/:CUI", (req, res) => {
                     res.json({Definitions_Returned: Definitions.length, Definitions, Terms_Returned: Terms.length, Terms});
                 }
             });
+        }
+    });
+});
+
+//Definition Route (String Input)
+app.get("/definition/string/:input", cors(), (req, res) => {
+    var query = "SELECT DISTINCT CUI, AUI, SAB, DEF " +
+                    "FROM MRDEF " +
+                    "WHERE CUI IN (SELECT DISTINCT CUI " +
+                                "FROM MRCONSO " +
+                                "WHERE STR = \'" + req.params.input + "\' " +
+                                "AND ISPREF = \'Y\')";
+
+    db.query(query, (err, Definitions) => {
+        if(err){
+            console.log("Error retrieving Definition information");
+            res.json({Definition: "Definition Does Not Exist"});
+        }
+        else{
+            console.log("Defintion Success");
+            res.json({Definitions_Returned: Definitions.length, Definitions})
         }
     });
 });
