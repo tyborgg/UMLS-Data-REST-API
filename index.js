@@ -66,7 +66,7 @@ app.get("/definition/CUI/:CUI", (req, res) => {
 });
 
 //Definition Route (String Input)
-app.get("/definition/string/:input", cors(), (req, res) => {
+app.get("/definition/term/:input", cors(), (req, res) => {
     var query = "SELECT DISTINCT CUI, AUI, SAB, DEF " +
                     "FROM MRDEF " +
                     "WHERE CUI IN (SELECT DISTINCT CUI " +
