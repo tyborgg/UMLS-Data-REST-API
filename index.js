@@ -44,7 +44,7 @@ app.get("/definition/CUI/:CUI", (req, res) => {
             res.json({Definition: "Definitions Do Not Exist For " + req.params.CUI});
         }
         else{
-            console.log("Defintion Success");
+            console.log("Definition Success");
 
             var query = "SELECT DISTINCT STR " +
                         "FROM mrconso " +
@@ -73,33 +73,59 @@ app.get("/definition/term/:input", cors(), (req, res) => {
                                 "FROM MRCONSO " +
                                 "WHERE STR = \'" + req.params.input + "\' " +
                                 "AND ISPREF = \'Y\') " + 
-                    "AND d.AUI = c.AUI;";
+                    "AND d.AUI = c.AUI " +
+                    "AND d.CUI = c.CUI";
+
+    console.log(req.params.input)
 
     db.query(query, (err, Definitions) => {
         if(err){
             console.log("Error retrieving Definition information");
-            res.json({Definition: "Definitions Do Not Exist For " + req.params.input});
+            res.json({Definitions_Returned: 0});
         }
         else{
-            console.log("Defintion Success");
+            console.log("Definition Success");
             res.json({Definitions_Returned: Definitions.length, Definitions})
         }
     });
 });
 
-//Relations Route
+//Relations Route (CUI input)
 app.get("/relation/CUI/:CUI", (req, res) => {
     var query = "SELECT DISTINCT r.CUI2 AS CUI1, r.AUI2 AS AUI1, c2.STR AS STR1, r.RELA, r.CUI1 AS CUI2, r.AUI1 AS AUI2, c1.STR AS STR2, r.REL " +
                 "FROM mrrel r, mrconso c1, mrconso c2 " +
                 "WHERE r.CUI2 = \'" + req.params.CUI + "\' " +
                 "AND r.AUI1 = c1.AUI " +
                 "AND r.AUI2 = c2.AUI " + 
-                "AND r.RELA IS NOT NULL;";
+                "AND r.RELA IS NOT NULL " +
+                "LIMIT 5;";
 
     db.query(query, (err, Relations) => {
         if(err){
             console.log("Error retrieving Relation information");
             res.json({Relation: "Relations Do Not Exist For " + req.params.CUI});
+        }
+        else{
+            console.log("Relation Success");
+            res.json({Relations_Returned: Relations.length, Relations})
+        }
+    });
+});
+
+//Relations Route (AUI input)
+app.get("/relation/AUI/:AUI", (req, res) => {
+    var query = "SELECT DISTINCT r.CUI2 AS CUI1, r.AUI2 AS AUI1, c2.STR AS STR1, r.RELA, r.CUI1 AS CUI2, r.AUI1 AS AUI2, c1.STR AS STR2, r.REL " +
+                "FROM mrrel r, mrconso c1, mrconso c2 " +
+                "WHERE r.AUI2 = \'" + req.params.AUI + "\' " +
+                "AND r.AUI1 = c1.AUI " +
+                "AND r.AUI2 = c2.AUI " + 
+                "AND r.RELA IS NOT NULL " +
+                "LIMIT 5;";
+
+    db.query(query, (err, Relations) => {
+        if(err){
+            console.log("Error retrieving Relation information");
+            res.json({Relation: "Relations Do Not Exist For " + req.params.AUI});
         }
         else{
             console.log("Relation Success");
